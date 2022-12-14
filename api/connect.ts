@@ -24,7 +24,7 @@ export const ContactMap = new Map<
       contact: {
         id: "张三",
         name: "张三",
-        avatar: "https://avatars.githubusercontent.com/u/20457624?v=4",
+        avatar: "",
         sessionList: [],
       },
     },
@@ -46,7 +46,7 @@ export default (ws: WebSocket, value: ConnectValue) => {
     let user: Contact = {
       id: userId,
       name: userId,
-      avatar: `https://i.pravatar.cc/150?u=${userId}`,
+      avatar: ``,
       sessionList: [],
     };
     Array.from(ContactMap.values()).forEach(({ contact, ws }) => {
