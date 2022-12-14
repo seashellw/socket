@@ -24,19 +24,23 @@ if (CERT_FILE && KEY_FILE) {
 }
 
 wsServer.on("connection", (ws) => {
+  let userId: string | undefined = undefined;
   ws.on("message", (data) => {
     if (!data.toString().startsWith("{")) return;
     try {
       let msg: WsMessage = JSON.parse(data.toString());
       switch (msg.key) {
         case "connect":
+          userId = msg.value.userId;
           connect(ws, msg.value);
           break;
         case "message-list":
-          messageList(ws, msg.value);
+          if (!userId) break;
+          messageList(userId, msg.value);
           break;
         case "send-message":
-          sendMessage(ws, msg.value);
+          if (!userId) break;
+          sendMessage(msg.value);
           break;
       }
     } catch (e) {
@@ -44,6 +48,6 @@ wsServer.on("connection", (ws) => {
     }
   });
   ws.on("close", () => {
-    close(ws);
+    close(userId);
   });
 });

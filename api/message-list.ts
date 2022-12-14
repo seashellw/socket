@@ -1,6 +1,6 @@
 import { WebSocket } from "ws";
 import sendMessageList from "../interface/message-list";
-import { SessionMap } from "./connect";
+import { ContactMap } from "./connect";
 import { Message } from "./send-message";
 
 export interface MessageListRequest {
@@ -33,14 +33,18 @@ export const messageListBinarySearch = (time: number, list: Message[]) => {
 /**
  * 获取消息列表
  */
-export default (ws: WebSocket, value: MessageListRequest) => {
-  const { id, end } = value;
-  const session = SessionMap.get(id);
+export default (userId: string, value: MessageListRequest) => {
+  const { id: sessionId, end } = value;
+  let user = ContactMap.get(userId);
+  if (!user || !user.ws) return;
+  const session = user.contact.sessionList.find(
+    (item) => item.id === sessionId
+  );
   if (!session) return;
   const { messageList } = session;
   let index = messageListBinarySearch(parseInt(end), messageList);
   let startIndex = index - 20;
   if (startIndex < 0) startIndex = 0;
   let list = messageList.slice(startIndex, index);
-  sendMessageList(ws, { id, list });
+  sendMessageList(user.ws, { id: sessionId, list });
 };

@@ -1,20 +1,22 @@
-import { WebSocket } from "ws";
-import { ConnectMap, Session } from "../api/connect";
+import { ContactMap, Session } from "../api/connect";
 import { send } from "../util/util";
 
 /**
  * 会话列表
  */
-export default (ws: WebSocket, session: Session) => {
+export default (id: string, session: Session) => {
   let name: string = "";
   let avatar: string = "";
-  const contact = ConnectMap.get(ws)?.user;
+  let res = ContactMap.get(id);
+  if (!res || !res.contact || !res.ws) return;
+  const contact = res.contact;
+  const ws = res.ws;
   if (session.contactList.length === 2) {
     const c = session.contactList.find((item) => item !== contact);
     name = c?.name || "";
     avatar = c?.avatar || "";
   }
-  let res = {
+  let value = {
     ...session,
     name,
     avatar,
@@ -26,5 +28,5 @@ export default (ws: WebSocket, session: Session) => {
       };
     }),
   };
-  send(ws, { key: "session", value: res });
+  send(ws, { key: "session", value });
 };

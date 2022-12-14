@@ -1,5 +1,4 @@
-import { WebSocket } from "ws";
-import { Session, ContactMap } from "../api/connect";
+import { ContactMap, Session } from "../api/connect";
 import { send } from "../util/util";
 
 export interface Contact {
@@ -12,7 +11,11 @@ export interface Contact {
 /**
  * 当前用户的信息
  */
-export default (ws: WebSocket, id: string) => {
+export default (id: string) => {
   const item = ContactMap.get(id);
-  send(ws, { key: "contact", value: { ...item, sessionList: undefined } });
+  if (!item?.ws) return;
+  send(item?.ws, {
+    key: "contact",
+    value: { ...item.contact, sessionList: undefined },
+  });
 };
